@@ -35,3 +35,22 @@ class Player6:
         cells = get_empty_out_of(board, blocks_allowed, block)
 	return cells[random.randrange(len(cells))]
 
+
+def get_empty_out_of(board, allowed, block):
+    cells = []
+    for val in allowed:
+        row_val = (val//3)*3
+        col_val = (val%3)*3
+        for i in range(row_val, row_val+3):
+            for j in range(col_val, col_val+3):
+                if board[i][j] == '-':
+                    cells.append((i, j))
+
+    if cells == []:
+        allowed = []
+        for val in range(0, 9):
+            if block[val] == '-':
+                allowed.append(val)
+        cells = get_empty_out_of(board, allowed, block)
+
+    return cells
