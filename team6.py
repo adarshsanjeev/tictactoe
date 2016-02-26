@@ -1,6 +1,8 @@
 #!/bin/python2.7
 
-class Player6:
+import random
+
+class Player1:
 
     def __init__(self):
         pass
@@ -30,7 +32,7 @@ class Player6:
         adjecent = filter(lambda x: x != -1, adjecent)
         return adjecent
 
-    def get_empty_out_of(board, allowed, block):
+    def get_empty_out_of(self, board, allowed, block):
         cells = []
         for val in allowed:
             row_val = (val//3)*3
@@ -44,7 +46,7 @@ class Player6:
             for val in range(0, 9):
                 if block[val] == '-':
                     allowed.append(val)
-            cells = get_empty_out_of(board, allowed, block)
+            cells = self.get_empty_out_of(board, allowed, block)
         return cells
     
     def move(self, board, block, old_move, flag):
