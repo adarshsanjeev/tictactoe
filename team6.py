@@ -49,8 +49,24 @@ class Player6:
             cells = self.get_empty_out_of(board, allowed, block)
         return cells
     
-    def move(self, board, block, old_move, flag):
+    def heuristic(self, board, block, new_move, flag):
+        return random.randrange(-100, 100)
+
+    def dfs_best_move(self, board, block, old_move, flag):
 	blocks_allowed  = self.get_allowed_blocks(old_move, block)
         cells = self.get_empty_out_of(board, blocks_allowed, block)
-	return cells[random.randrange(len(cells))]
+        move_dict = {}
 
+        # CASE FOR MAX DEPTH OR TERMINAL 
+        # APPLY HEURISTIC
+        for move in cells:
+            move_dict[move] = self.heuristic(board, block, move, flag)
+        k=list(move_dict.keys())
+        v=list(move_dict.values())
+        return k[v.index(max(v))]
+    
+
+    def move(self, board, block, old_move, flag):
+        # HARDCODE INITAL GAME MOVEMENTS HERE
+
+	return self.dfs_best_move(board, block, old_move, flag)

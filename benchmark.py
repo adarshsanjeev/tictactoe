@@ -1,15 +1,18 @@
 #!/bin/python2.7
 
-import os
+import sys
 from subprocess import Popen, PIPE
 
-RUN_TIMES = 100
+RUN_TIMES = 10
 
 standings = {
     'P1':{},
     'P2':{},
     'NONE':{}
 }
+
+if len(sys.argv) == 2:
+    RUN_TIMES = int(sys.argv[1])
 
 while RUN_TIMES:
     (stdout, stderr) = Popen(['bash', 'benchmark.sh'], stdout=PIPE).communicate()
@@ -22,9 +25,9 @@ while RUN_TIMES:
 
 for key in standings:
     total = 0
-    print key, ":"
+    print "\n", key, ":"
     for reason in standings[key]:
         print "\t", reason, ":", standings[key][reason]
         total += standings[key][reason]
     print "Total Won:", total
-    print "\n#####\n"
+    print "\n#####"
