@@ -16,7 +16,7 @@ In case of any queries, please post on moodle.iiit.ac.in
 import sys
 import random
 import signal
-from team6 import Player1
+from team6 import Player6
 
 def handler(signum, frame):
     #print 'Signal handler called with signal', signum
@@ -338,7 +338,7 @@ def simulate(obj1,obj2):
 		gamestatus, mesg =  terminal_state_reached(game_board, block_stat,p1_pts,p2_pts)
 		if gamestatus == True:
 			print_lists(game_board, block_stat)
-			WINNER, MESSAGE = decide_winner_and_get_message('P1', mesg,  'COMPLETE')	
+			WINNER, MESSAGE = decide_winner_and_get_message('P1', mesg,  'COMPLETE')
 			break
 
 		
@@ -397,11 +397,11 @@ if __name__ == '__main__':
 	obj2 = ''
 	option = sys.argv[1]	
 	if option == '1':
-		obj1 = Player1()
+		obj1 = Player6()
 		obj2 = Player2()
 
 	elif option == '2':
-		obj1 = Player1()
+		obj1 = Player6()
 		obj2 = ManualPlayer()
 	elif option == '3':
 		obj1 = ManualPlayer()

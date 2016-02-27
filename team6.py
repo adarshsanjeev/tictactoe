@@ -2,7 +2,7 @@
 
 import random
 
-class Player1:
+class Player6:
 
     def __init__(self):
         pass
