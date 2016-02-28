@@ -412,7 +412,7 @@ if __name__ == '__main__':
 		print 'Invalid option'
 		sys.exit(1)
 
-	num = random.uniform(0,1)
+	num = 0 #random.uniform(0,1)
 	if num > 0.5:
 		simulate(obj2, obj1)
 	else:

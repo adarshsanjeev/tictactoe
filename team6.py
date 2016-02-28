@@ -3,10 +3,14 @@
 import random
 import copy
 
+
+
 class Player6:
     def __init__(self):
         pass
-
+    
+    WIN = ((0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6))
+    mapping = {'x':1,'-':0,'o':-1}
     adjecence_dict = {
         0: [1, 3],
         1: [0, 2],
@@ -48,6 +52,7 @@ class Player6:
                 print
             print 
             for j in range(9):
+    
                 if j%3 == 0:
                     print "   ",
                 print board[i][j]," ",
@@ -83,7 +88,78 @@ class Player6:
     
     def heuristic(self, board, block, new_move, flag):
         # THIS FUNCTION, SHIVIN
-        return random.randrange(-100, 100)
+        return self.evaluate_board(board,block,flag,self.flag_alternate[flag])
+        #return random.randrange(-100, 100)
+    
+        self.mapping[flag]=1
+        self.mapping[self.flag_alternate[flag]]=-1
+
+
+    def evaluate_block(self,block_id,board,flag1,flag2):
+        
+        self.mapping[flag1]=1
+        self.mapping[self.mapping[flag2]]=-1
+        
+        power = 0 
+        base = ((block_id//3)*3, (block_id%3)*3)
+        block_id = base[0] + base[1]/3
+        val = 0
+        #ROWS
+        for i in range(3):
+            val = 0
+            for j in range(3):
+                val = val + self.mapping[board[base[0]+i][base[1]+j]]
+            if val > 0 :
+                power = power + pow(10,val)
+            elif val < 0 :
+                power = power - pow(10,val)
+    
+        #COLS
+        for j in range(3):
+            val = 0
+            for i in range(3):
+                val = val + self.mapping[board[base[0]+i][base[1]+j]]
+            if val > 0 :
+                power = power + pow(10,val)
+            elif val < 0 :
+                power = power - pow(10,val)
+        
+        val=0
+        for i in range(3):
+            val = val + self.mapping[board[base[0]+i][base[1]+i]]
+        if val > 0 :
+            power = power + pow(10,val)
+        elif val < 0 :
+            power = power - pow(10,val)
+    
+        val = 0
+        for i in range(3):
+            val = val + self.mapping[board[base[0]+i][base[1]+2-i]]
+        if val > 0 :
+            power = power + pow(10,val)
+        elif val < 0 :
+            power = power - pow(10,val)
+        
+        return power
+    
+
+    def evaluate_board(self,board,blocks,flag1,flag2):
+        sum = 0 
+        for line in self.WIN:
+            val = 0
+            for cell in line:
+                if(blocks[cell]==flag1):
+                    val+=1
+                elif(blocks[cell]==flag2):
+                    val-=1
+            if(val>0):
+                sum = sum + 10*pow(10,val)
+            elif(val<0):
+                sum = sum - 10*pow(10,val)
+        
+        for i in range(9):
+            sum = sum + self.evaluate_block(i,board,flag1,flag2)
+        return sum 
 
     def apply_move(self, board, block, move, flag):
         board[move[0]][move[1]] = flag
@@ -116,24 +192,20 @@ class Player6:
                 move_dict[move] = self.heuristic(temp_board, temp_block, move, flag)
             else:
                 m, v = self.dfs_best_move(temp_board, temp_block, move, self.flag_alternate[flag], depth+1)
-                move_dict[move] = v
+                move_dict[move] = -1*v
         # Return maximum val
-            k=list(move_dict.keys())
-            v=list(move_dict.values())
+        k=list(move_dict.keys())
+        v=list(move_dict.values())
         try:
             v.index(max(v))
         except ValueError:
             print "HELLO DARKNESS, MY OLD FRIEND"
             raise
         # Minimax
-        if depth%2 == 0:
-            return k[v.index(max(v))], v.index(max(v))
-        else:
-            return k[v.index(min(v))], v.index(min(v))
+        return k[v.index(max(v))], v.index(max(v))
 
     def move(self, board, block, old_move, flag):
         # TODO HARDCODE INITAL GAME MOVEMENTS HERE
-
         # V = value
         m, v = self.dfs_best_move(board, block, old_move, flag, 0)
 	return m

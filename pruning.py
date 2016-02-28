@@ -1,6 +1,3 @@
-import sys
-import random
-
 WIN = ((0, 1, 2), (3, 4, 5), (6, 7, 8), (0, 3, 6), (1, 4, 7), (2, 5, 8), (0, 4, 8), (2, 4, 6))
 
 mapping = {'x':1,'-':0,'o':-1}
@@ -53,14 +50,16 @@ def evaluate_board(self,board,blocks,flag1,flag2):
     for line in WIN:
         val = 0
         for cell in line:
-            if(block[cell]==flag1):
+            if(blocks[cell]==flag1):
                 val+=1
-            elif(block[cell]==flag2):
+            elif(blocks[cell]==flag2):
                 val-=1
         if(val>0):
             sum = sum + 10*pow(10,val)
         elif(val<0):
             sum = sum - 10*pow(10,val)
-
+        
+    for i in range(9):
+        sum = sum + evaluate_block(i,board)
     return sum 
 
