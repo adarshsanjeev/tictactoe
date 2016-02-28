@@ -100,7 +100,7 @@ class Player6:
         self.mapping[flag1]=1
         self.mapping[self.mapping[flag2]]=-1
         
-        power = 0 
+        power = 0
         base = ((block_id//3)*3, (block_id%3)*3)
         block_id = base[0] + base[1]/3
         val = 0
@@ -112,7 +112,7 @@ class Player6:
             if val > 0 :
                 power = power + pow(10,val)
             elif val < 0 :
-                power = power - pow(10,val)
+                power = power - pow(10,-1*val)
     
         #COLS
         for j in range(3):
@@ -122,7 +122,7 @@ class Player6:
             if val > 0 :
                 power = power + pow(10,val)
             elif val < 0 :
-                power = power - pow(10,val)
+                power = power - pow(10,-1*val)
         
         val=0
         for i in range(3):
@@ -130,7 +130,7 @@ class Player6:
         if val > 0 :
             power = power + pow(10,val)
         elif val < 0 :
-            power = power - pow(10,val)
+            power = power - pow(10,-1*val)
     
         val = 0
         for i in range(3):
@@ -138,7 +138,7 @@ class Player6:
         if val > 0 :
             power = power + pow(10,val)
         elif val < 0 :
-            power = power - pow(10,val)
+            power = power - pow(10,-1*val)
         
         return power
     
@@ -155,7 +155,7 @@ class Player6:
             if(val>0):
                 sum = sum + 10*pow(10,val)
             elif(val<0):
-                sum = sum - 10*pow(10,val)
+                sum = sum - 10*pow(10,-1*val)
         
         for i in range(9):
             sum = sum + self.evaluate_block(i,board,flag1,flag2)
@@ -192,17 +192,13 @@ class Player6:
                 move_dict[move] = self.heuristic(temp_board, temp_block, move, flag)
             else:
                 m, v = self.dfs_best_move(temp_board, temp_block, move, self.flag_alternate[flag], depth+1)
-                move_dict[move] = -1*v
+                move_dict[move] = v
         # Return maximum val
+        print "###", old_move, depth, move_dict
         k=list(move_dict.keys())
         v=list(move_dict.values())
-        try:
-            v.index(max(v))
-        except ValueError:
-            print "HELLO DARKNESS, MY OLD FRIEND"
-            raise
         # Minimax
-        return k[v.index(max(v))], v.index(max(v))
+        return k[v.index(max(v))], max(v)
 
     def move(self, board, block, old_move, flag):
         # TODO HARDCODE INITAL GAME MOVEMENTS HERE
