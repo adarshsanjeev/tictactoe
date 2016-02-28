@@ -3,6 +3,8 @@
 import os
 import sys
 from subprocess import Popen, PIPE
+from multiprocessing import cpu_count
+import threading
 
 RUN_TIMES = 10
 
@@ -16,6 +18,8 @@ if len(sys.argv) == 2:
     RUN_TIMES = int(sys.argv[1])
 
 def print_results():
+    os.system('clear')
+    print "MATCHES LEFT:", RUN_TIMES
     for key in standings:
         total = 0
         print "\n", key, ":"
@@ -25,14 +29,31 @@ def print_results():
         print "Total Won:", total
         print "\n#####"
 
-while RUN_TIMES:
-    os.system('clear')
-    print "MATCHES LEFT:", RUN_TIMES
-    print_results()
-    (stdout, stderr) = Popen(['bash', 'benchmark.sh'], stdout=PIPE).communicate()
-    winner, reason = stdout.strip().split('\n')
-    if reason in standings[winner]:
-        standings[winner][reason] += 1
-    else:
-        standings[winner][reason] = 1
-    RUN_TIMES -= 1
+def run_prog():
+    global RUN_TIMES, standings
+    while RUN_TIMES >= 0:
+        score_lock.acquire_lock()
+        print_results()
+        score_lock.release_lock()
+
+        (stdout, stderr) = Popen(['bash', 'benchmark.sh'], stdout=PIPE).communicate()
+        winner, reason = stdout.strip().split('\n')
+
+        score_lock.acquire_lock()
+        if reason in standings[winner]:
+            standings[winner][reason] += 1
+        else:
+            standings[winner][reason] = 1
+        RUN_TIMES -= 1
+        score_lock.release_lock()
+
+score_lock = threading.Lock()
+CORES = cpu_count()
+threads = [threading.Thread(target=run_prog) for i in range(CORES)]
+
+for i in range(CORES):
+    threads[i].setDaemon(True)
+    threads[i].start()
+
+for i in range(CORES):
+    threads[i].join()
