@@ -16,8 +16,10 @@ In case of any queries, please post on moodle.iiit.ac.in
 import sys
 import random
 import signal
-import os
 from team6 import Player6
+
+class TimedOutExc(Exception):
+        pass
 
 def handler(signum, frame):
     #print 'Signal handler called with signal', signum
@@ -33,6 +35,22 @@ class ManualPlayer:
 		mvp = mvp.split()
 		return (int(mvp[0]), int(mvp[1]))
 		
+
+
+class Player1:
+	
+	def __init__(self):
+		# You may initialize your object here and use any variables for storing throughout the game
+		pass
+
+	def move(self,temp_board,temp_block,old_move,flag):
+		#List of permitted blocks, based on old move.
+		blocks_allowed  = determine_blocks_allowed(old_move, temp_block)
+		#Get list of empty valid cells
+		cells = get_empty_out_of(temp_board, blocks_allowed,temp_block)
+		#Choose a move based on some algorithm, here it is a random move.
+		return cells[random.randrange(len(cells))]
+
 class Player2:
 	
 	def __init__(self):
@@ -121,26 +139,7 @@ def get_empty_out_of(gameb, blal,block_stat):
 					if gameb[i][j] == '-':
 						cells.append((i,j))
 	return cells
-	
-def get_empty_out_of(board, allowed, block):
-    cells = []
-    for val in allowed:
-        row_val = (val//3)*3
-        col_val = (val%3)*3
-        for i in range(row_val, row_val+3):
-            for j in range(col_val, col_val+3):
-                if board[i][j] == '-':
-                    cells.append((i, j))
-
-    if cells == []:
-        allowed = []
-        for val in range(0, 9):
-            if block[val] == '-':
-                allowed.append(val)
-        cells = get_empty_out_of(board, allowed, block)
-
-    return cells
-	
+		
 # Returns True if move is valid
 def check_valid_move(game_board, block_stat, current_move, old_move):
 
@@ -189,8 +188,6 @@ def update_lists(game_board, block_stat, move_ret, fl):
 			if game_board[i][j] == '-':
 				flag = 1
 
-	if flag == 0:
-		block_stat[block_no] = 'D'
 
 	if block_stat[block_no] == '-':
 		if game_board[id1*3][id2*3] == game_board[id1*3+1][id2*3+1] and game_board[id1*3+1][id2*3+1] == game_board[id1*3+2][id2*3+2] and game_board[id1*3+1][id2*3+1] != '-' and game_board[id1*3+1][id2*3+1] != 'D':
@@ -207,6 +204,8 @@ def update_lists(game_board, block_stat, move_ret, fl):
                         if game_board[i][id2*3]==game_board[i][id2*3+1] and game_board[i][id2*3+1] == game_board[i][id2*3+2] and game_board[i][id2*3] != '-' and game_board[i][id2*3] != 'D':
                                 mflg = 1
                                 break
+	if flag == 0:
+		block_stat[block_no] = 'D'
 	if mflg == 1:
 		block_stat[block_no] = fl
 	
@@ -262,7 +261,6 @@ def decide_winner_and_get_message(player,status, message):
 
 
 def print_lists(gb, bs):
-        # os.system('clear')
 	print '=========== Game Board ==========='
 	for i in range(9):
 		if i > 0 and i % 3 == 0:
@@ -299,27 +297,27 @@ def simulate(obj1,obj2):
 
 	WINNER = ''
 	MESSAGE = ''
-	TIMEALLOWED = 12000
+	TIMEALLOWED = 12
 	p1_pts=0
 	p2_pts=0
 
 	print_lists(game_board, block_stat)
 
 	while(1): # Main game loop
-	
+		
 		temp_board_state = game_board[:]
 		temp_block_stat = block_stat[:]
 	
 		signal.signal(signal.SIGALRM, handler)
 		signal.alarm(TIMEALLOWED)
-		ret_move_pl1 = pl1.move(temp_board_state, temp_block_stat, old_move, pl1_fl)
+#		ret_move_pl1 = pl1.move(temp_board_state, temp_block_stat, old_move, pl1_fl)
 
-#		try:
-#			ret_move_pl1 = pl1.move(temp_board_state, temp_block_stat, old_move, pl1_fl)
-#		except:
-#			WINNER, MESSAGE = decide_winner_and_get_message('P1', 'L',   'TIMED OUT')
-#			print MESSAGE
-#			break
+		try:
+			ret_move_pl1 = pl1.move(temp_board_state, temp_block_stat, old_move, pl1_fl)
+		except:
+			WINNER, MESSAGE = decide_winner_and_get_message('P1', 'L',   'TIMED OUT')
+		#	print MESSAGE
+			break
 		signal.alarm(0)
 	
 		# Check if list is tampered.
@@ -340,7 +338,7 @@ def simulate(obj1,obj2):
 		gamestatus, mesg =  terminal_state_reached(game_board, block_stat,p1_pts,p2_pts)
 		if gamestatus == True:
 			print_lists(game_board, block_stat)
-			WINNER, MESSAGE = decide_winner_and_get_message('P1', mesg,  'COMPLETE')
+			WINNER, MESSAGE = decide_winner_and_get_message('P1', mesg,  'COMPLETE')	
 			break
 
 		
