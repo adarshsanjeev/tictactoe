@@ -16,6 +16,7 @@ In case of any queries, please post on moodle.iiit.ac.in
 import sys
 import random
 import signal
+import os
 from team6 import Player6
 
 def handler(signum, frame):
@@ -261,6 +262,7 @@ def decide_winner_and_get_message(player,status, message):
 
 
 def print_lists(gb, bs):
+        # os.system('clear')
 	print '=========== Game Board ==========='
 	for i in range(9):
 		if i > 0 and i % 3 == 0:
@@ -304,7 +306,7 @@ def simulate(obj1,obj2):
 	print_lists(game_board, block_stat)
 
 	while(1): # Main game loop
-		
+	
 		temp_board_state = game_board[:]
 		temp_block_stat = block_stat[:]
 	
