@@ -5,6 +5,7 @@ import sys
 from subprocess import Popen, PIPE
 from multiprocessing import cpu_count
 import threading
+from time import time
 
 RUN_TIMES = 10
 
@@ -28,18 +29,27 @@ def print_results():
             total += standings[key][reason]
         print "Total Won:", total
         print "\n#####"
+    # print "Time:", avg
+
+times = 0
+avg = 0.0
 
 def run_prog():
     global RUN_TIMES, standings
+    global times, avg
     while RUN_TIMES >= 0:
         score_lock.acquire_lock()
         print_results()
         score_lock.release_lock()
 
+        start = time()
         (stdout, stderr) = Popen(['bash', 'benchmark.sh'], stdout=PIPE).communicate()
+        run_time = time()-start
         winner, reason = stdout.strip().split('\n')
 
         score_lock.acquire_lock()
+        avg = ((avg*times)+run_time)/(times+1)
+        times += 1
         if reason in standings[winner]:
             standings[winner][reason] += 1
         else:
@@ -48,7 +58,7 @@ def run_prog():
         score_lock.release_lock()
 
 score_lock = threading.Lock()
-CORES = cpu_count()
+CORES = 1#cpu_count()
 threads = [threading.Thread(target=run_prog) for i in range(CORES)]
 
 for i in range(CORES):

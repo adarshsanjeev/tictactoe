@@ -172,7 +172,7 @@ class Player6:
         else:
             return True
 
-    MAX_DEPTH = 4
+    MAX_DEPTH = 3
     flag_alternate = {'x':'o', 'o':'x'}
 
     def dfs_best_move(self, board, block, old_move, flag, depth, alpha, beta):
