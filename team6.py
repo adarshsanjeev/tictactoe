@@ -144,7 +144,7 @@ class Player6:
     
 
     def evaluate_board(self,board,blocks,flag1,flag2):
-        sum = 0 
+        sum = 0
         for line in self.WIN:
             val = 0
             for cell in line:
@@ -172,10 +172,10 @@ class Player6:
         else:
             return True
 
-    MAX_DEPTH = 2
+    MAX_DEPTH = 3
     flag_alternate = {'x':'o', 'o':'x'}
 
-    def dfs_best_move(self, board, block, old_move, flag, depth):
+    def dfs_best_move(self, board, block, old_move, flag, depth, alpha, beta):
         # Get available blocks
 	blocks_allowed  = self.get_allowed_blocks(old_move, block)
         cells = self.get_empty_out_of(board, blocks_allowed, block)
@@ -191,18 +191,22 @@ class Player6:
             if self.check_terminal_state(temp_board, temp_block) is True or depth+1 >= self.MAX_DEPTH:
                 move_dict[move] = self.heuristic(temp_board, temp_block, move, flag)
             else:
-                m, v = self.dfs_best_move(temp_board, temp_block, move, self.flag_alternate[flag], depth+1)
+                m, v = self.dfs_best_move(temp_board, temp_block, move, self.myflag, depth+1, alpha, beta)
                 move_dict[move] = v
         # Return maximum val
-        print "###", old_move, depth, move_dict
+        # print depth, "###", old_move, move_dict
         k=list(move_dict.keys())
         v=list(move_dict.values())
         # Minimax
-        return k[v.index(max(v))], max(v)
+        if depth%2 == 0:
+            return k[v.index(max(v))], max(v)
+        else:
+            return k[v.index(min(v))], min(v)
 
     def move(self, board, block, old_move, flag):
         # TODO HARDCODE INITAL GAME MOVEMENTS HERE
         # V = value
-        m, v = self.dfs_best_move(board, block, old_move, flag, 0)
+        self.myflag = flag
+        m, v = self.dfs_best_move(board, block, old_move, flag, 0, None, None)
 	return m
 
