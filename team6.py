@@ -24,11 +24,11 @@ class Player6:
             return [i for i in range(9)]
         coordinate = (old_move[0]%3, old_move[1]%3)
         new_block = coordinate[0]*3 + coordinate[1]
-        adjecent = self.adjecence_dict[new_block]
-        for index, val in enumerate(adjecent):
-            if block[val] != '-':
-                adjecent[index] = -1
-        adjecent = filter(lambda x: x != -1, adjecent)
+        adjecent = copy.copy(self.adjecence_dict[new_block])
+        adjecent = filter(lambda x: block[x] == '-', adjecent)
+        if adjecent == []:
+            adjecent = [i for i in range(9)]            
+            adjecent = filter(lambda x: block[x] == '-', adjecent)
         return adjecent
 
     def get_empty_out_of(self, board, allowed, block):
@@ -40,35 +40,46 @@ class Player6:
                 for j in range(col_val, col_val+3):
                     if board[i][j] == '-':
                         cells.append((i, j))
-        if cells == []:
-            allowed = []
-            for val in range(0, 9):
-                if block[val] == '-':
-                    allowed.append(val)
-            cells = self.get_empty_out_of(board, allowed, block)
         return cells
+
+    def print_board(self, board, block):
+        for i in range(9):
+            if i%3 == 0:
+                print
+            print 
+            for j in range(9):
+                if j%3 == 0:
+                    print "   ",
+                print board[i][j]," ",
+        print "\n", block
 
     def check_block_win(self, board, block, move, flag):
         base = ((move[0]/3)*3, (move[1]/3)*3)
         block_id = base[0] + base[1]/3
+        # print move, flag
+        # print base, block_id
+        # print "BEFORE"
+        # self.print_board(board, block)
         #ROWS
-        for i in range(3):
-            if board[base[0]+i][base[1]] == board[base[0]+i][base[1]+1] == board[base[0]+i][base[1]+2] == flag:
+        for i in range(base[0], base[0]+3):
+            if board[i][base[1]] == board[i][base[1]+1] == board[i][base[1]+2] == flag:
                 block[block_id] = flag
-                return True
         #COLS
-        for i in range(3):
-            if board[base[0]][base[1]+i] == board[base[0]+1][base[1]+i] == board[base[0]+2][base[1]+i] == flag:
+        for i in range(base[1], base[1]+3):
+            if board[base[0]][i] == board[base[0]+1][i] == board[base[0]+2][i] == flag:
                 block[block_id] = flag
-                return True
         #DIAG
         if board[base[0]][base[1]] == board[base[0]+1][base[1]+1] == board[base[0]+2][base[1]+2] == flag:
             block[block_id] = flag
-            return True
-        if board[base[0]+2][base[1]] == board[base[0]+1][base[1]+i] == board[base[0]][base[1]+2] == flag:
+        if board[base[0]+2][base[1]] == board[base[0]+1][base[1]+1] == board[base[0]][base[1]+2] == flag:
             block[block_id] = flag
-            return True
-        return False
+            
+        for i in range(base[0], base[0]+3):
+            for j in range(base[1], base[1]+3):
+                if board[i][j] == '-':
+                    pass
+            else:
+                block[block_id] = 'D'
     
     def heuristic(self, board, block, new_move, flag):
         # THIS FUNCTION, SHIVIN
@@ -80,23 +91,12 @@ class Player6:
         self.check_block_win(board, block, move, flag)
 
     def check_terminal_state(self, board, block):
-        # ROWS
-        for i in range(3):
-            if block[3*i] == block[3*i+1] == block[3*i+2] != '-':
-                return block[i]
-        # COLS
-        for i in range(3):
-            if block[i] == block[i+3] == block[i+6] != '-':
-                return block[i]
-        # DIAG
-        if block[0] == block[4] == block[8] != '-' or block[2] == block[4] == block[8] != '-':
-                return block[i]
-        # DRAW
-        if '-' not in block:
-            return 'D'
-        return '-'
+        if '-' in block:
+            return False
+        else:
+            return True
 
-    MAX_DEPTH = 1
+    MAX_DEPTH = 2
     flag_alternate = {'x':'o', 'o':'x'}
 
     def dfs_best_move(self, board, block, old_move, flag, depth):
@@ -111,23 +111,26 @@ class Player6:
             temp_block = copy.deepcopy(block)
             # Apply the current move to the instance
             self.apply_move(temp_board, temp_block, move, flag)
-            # Check if terminal
-            winner = self.check_terminal_state(temp_board, temp_block)
             # If end node, apply heuristic, else, apply recursion
-            if winner == '-' or depth+1 >= self.MAX_DEPTH:
+            if self.check_terminal_state(temp_board, temp_block) is True or depth+1 >= self.MAX_DEPTH:
                 move_dict[move] = self.heuristic(temp_board, temp_block, move, flag)
             else:
                 m, v = self.dfs_best_move(temp_board, temp_block, move, self.flag_alternate[flag], depth+1)
                 move_dict[move] = v
         # Return maximum val
-        k=list(move_dict.keys())
-        v=list(move_dict.values())
+            k=list(move_dict.keys())
+            v=list(move_dict.values())
+        try:
+            v.index(max(v))
+        except ValueError:
+            print "HELLO DARKNESS, MY OLD FRIEND"
+            raise
         # Minimax
         if depth%2 == 0:
             return k[v.index(max(v))], v.index(max(v))
         else:
             return k[v.index(min(v))], v.index(min(v))
-    
+
     def move(self, board, block, old_move, flag):
         # TODO HARDCODE INITAL GAME MOVEMENTS HERE
 
