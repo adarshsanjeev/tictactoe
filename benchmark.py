@@ -26,10 +26,10 @@ def print_results():
         print "\n#####"
 
 while RUN_TIMES:
-    (stdout, stderr) = Popen(['bash', 'benchmark.sh'], stdout=PIPE).communicate()
     os.system('clear')
     print "MATCHES LEFT:", RUN_TIMES
     print_results()
+    (stdout, stderr) = Popen(['bash', 'benchmark.sh'], stdout=PIPE).communicate()
     winner, reason = stdout.strip().split('\n')
     if reason in standings[winner]:
         standings[winner][reason] += 1

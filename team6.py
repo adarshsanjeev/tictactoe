@@ -172,7 +172,7 @@ class Player6:
         else:
             return True
 
-    MAX_DEPTH = 3
+    MAX_DEPTH = 4
     flag_alternate = {'x':'o', 'o':'x'}
 
     def dfs_best_move(self, board, block, old_move, flag, depth, alpha, beta):
@@ -193,6 +193,16 @@ class Player6:
             else:
                 m, v = self.dfs_best_move(temp_board, temp_block, move, self.myflag, depth+1, alpha, beta)
                 move_dict[move] = v
+                if depth%2 == 0: #MAX NODE
+                    node_val = max(list(move_dict.values()))
+                    if beta is not None and v > beta:
+                        break
+                    alpha = node_val
+                else:            #MIN NODE
+                    node_val = min(list(move_dict.values()))
+                    if alpha is not None and v < alpha:
+                        break
+                    beta = node_val
         # Return maximum val
         # print depth, "###", old_move, move_dict
         k=list(move_dict.keys())
