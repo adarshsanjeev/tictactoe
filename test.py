@@ -18,6 +18,7 @@ import random
 import signal
 from team6 import Player6
 from time import time
+import os
 
 class TimedOutExc(Exception):
         pass
@@ -264,6 +265,7 @@ def decide_winner_and_get_message(player,status, message):
 
 
 def print_lists(gb, bs):
+        os.system('clear')
 	print '=========== Game Board ==========='
 	for i in range(9):
 		if i > 0 and i % 3 == 0:
@@ -319,11 +321,15 @@ def simulate(obj1,obj2):
 		try:
                         start_time = time()
 			ret_move_pl1 = pl1.move(temp_board_state, temp_block_stat, old_move, pl1_fl)
+                        print ret_move_pl1
                         run_time = time() - start_time
+                except KeyboardInterrupt:
+                        raise
 		except:
 			WINNER, MESSAGE = decide_winner_and_get_message('P1', 'L',   'TIMED OUT')
-		#	print MESSAGE
+		        #	print MESSAGE
 			break
+
 		signal.alarm(0)
                 
                 move_time += [run_time]

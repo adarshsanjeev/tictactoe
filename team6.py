@@ -172,12 +172,19 @@ class Player6:
         else:
             return True
 
-    MAX_DEPTH = 3
+    MAX_DEPTH = 4
     flag_alternate = {'x':'o', 'o':'x'}
 
     def dfs_best_move(self, board, block, old_move, flag, depth, alpha, beta):
         # Get available blocks
 	blocks_allowed  = self.get_allowed_blocks(old_move, block)
+
+        # BASE HARDCODE
+        if sum(1 for row in board for i in row if i == '-') > 73:
+            for choice in blocks_allowed:
+                base = ((choice/3)*3+1, (choice%3)*3+1)
+                if board[base[0]][base[1]] == '-':
+                    return base, 0
         cells = self.get_empty_out_of(board, blocks_allowed, block)
         # Process each in DFS
         move_dict = {}
