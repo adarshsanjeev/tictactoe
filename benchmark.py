@@ -29,7 +29,7 @@ def print_results():
             total += standings[key][reason]
         print "Total Won:", total
         print "\n#####"
-    print "\n".join(time_log[-8:])
+    print "\n".join(time_log[-20:])
 
 time_log = []
 

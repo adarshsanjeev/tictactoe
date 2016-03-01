@@ -202,14 +202,14 @@ class Player6:
                 move_dict[move] = v
                 if depth%2 == 0: #MAX NODE
                     node_val = max(list(move_dict.values()))
-                    if beta is not None and v > beta:
-                        break
                     alpha = node_val
+                    if beta is not None and beta <= alpha:
+                        break
                 else:            #MIN NODE
                     node_val = min(list(move_dict.values()))
-                    if alpha is not None and v < alpha:
-                        break
                     beta = node_val
+                    if alpha is not None and beta <= alpha:
+                        break
         # Return maximum val
         # print depth, "###", old_move, move_dict
         k=list(move_dict.keys())
