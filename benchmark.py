@@ -29,27 +29,24 @@ def print_results():
             total += standings[key][reason]
         print "Total Won:", total
         print "\n#####"
-    # print "Time:", avg
+    print "\n".join(time_log[-8:])
 
-times = 0
-avg = 0.0
+time_log = []
 
 def run_prog():
-    global RUN_TIMES, standings
-    global times, avg
+    global RUN_TIMES, standings, time_log
     while RUN_TIMES >= 0:
         score_lock.acquire_lock()
         print_results()
         score_lock.release_lock()
 
-        start = time()
         (stdout, stderr) = Popen(['bash', 'benchmark.sh'], stdout=PIPE).communicate()
-        run_time = time()-start
-        winner, reason = stdout.strip().split('\n')
+        winner, reason, time_list = stdout.strip().split('\n')[-3:]
 
         score_lock.acquire_lock()
-        avg = ((avg*times)+run_time)/(times+1)
-        times += 1
+        if winner == "P2":
+            open('loses', 'a+').write(stdout)
+        time_log += [time_list]
         if reason in standings[winner]:
             standings[winner][reason] += 1
         else:
@@ -67,3 +64,5 @@ for i in range(CORES):
 
 for i in range(CORES):
     threads[i].join()
+
+open('benchmark.log', 'w+').write("\n".join(time_log[:10]))

@@ -17,9 +17,12 @@ import sys
 import random
 import signal
 from team6 import Player6
+from time import time
 
 class TimedOutExc(Exception):
         pass
+
+move_time = []
 
 def handler(signum, frame):
     #print 'Signal handler called with signal', signum
@@ -282,6 +285,7 @@ def print_lists(gb, bs):
 	
 
 def simulate(obj1,obj2):
+        global move_time
 	
 	# Game board is a 9x9 list of lists & block_stat is a list of 9 elements indicating if a block has been won.
 	game_board, block_stat = get_init_board_and_blockstatus()
@@ -310,16 +314,20 @@ def simulate(obj1,obj2):
 	
 		signal.signal(signal.SIGALRM, handler)
 		signal.alarm(TIMEALLOWED)
-#		ret_move_pl1 = pl1.move(temp_board_state, temp_block_stat, old_move, pl1_fl)
+                #		ret_move_pl1 = pl1.move(temp_board_state, temp_block_stat, old_move, pl1_fl)
 
 		try:
+                        start_time = time()
 			ret_move_pl1 = pl1.move(temp_board_state, temp_block_stat, old_move, pl1_fl)
+                        run_time = time() - start_time
 		except:
 			WINNER, MESSAGE = decide_winner_and_get_message('P1', 'L',   'TIMED OUT')
 		#	print MESSAGE
 			break
 		signal.alarm(0)
-	
+                
+                move_time += [run_time]
+
 		# Check if list is tampered.
 		if not (verification_fails_board(game_board, temp_board_state) and verification_fails_block(block_stat, temp_block_stat)):
 			WINNER, MESSAGE = decide_winner_and_get_message('P1', 'L',   'MODIFIED CONTENTS OF LISTS')
@@ -380,8 +388,13 @@ def simulate(obj1,obj2):
 			old_move = ret_move_pl2
 			print_lists(game_board, block_stat)
 	
+
 	print WINNER
 	print MESSAGE
+        move_time = map(lambda x: str(round(x, 3)), move_time)
+        print len(move_time), ":",
+        print ", ".join(move_time)
+
 
 if __name__ == '__main__':
 	## get game playing objects
