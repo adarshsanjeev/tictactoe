@@ -145,12 +145,12 @@ class Player6:
             power = power + val
         
        
-        """ if(board[base[0]+1][base[1]+1]==flag1 ):
-            power = power + self.mapping[board[base[0]+1][base[1]+1]]
-        """
+        if(board[base[0]+1][base[1]+1]==flag1 ):
+            power = power + 2*self.mapping[board[base[0]+1][base[1]+1]]
+
         for i in [0,2]:
             for j in [0,2]:
-                power = power + 2*self.mapping[board[base[0]+1][base[1]+1]]
+                power = power + self.mapping[board[base[0]+1][base[1]+1]]
 
         
         val=0
@@ -158,9 +158,9 @@ class Player6:
             for j in range(base[1],base[1]+3):
                 val = val+self.mapping[board[i][j]]
         
-        """ if block_id == 4:
-            val = val*3
-        """ 
+        if block_id == 4:
+            val = val*2
+
         power = power + val
         return power
     
@@ -185,11 +185,11 @@ class Player6:
             elif(val==-30):
                 sum = sum - 10000
             sum = sum + val
-        """if(blocks[4]==flag1):
+        if(blocks[4]==flag1):
             sum = sum + 5
         elif(blocks[4]==flag2):
             sum = sum - 5
-        """
+
         for i in [0,2,6,8]:
             if(blocks[i] == flag1):
                 sum = sum + 4
@@ -242,12 +242,11 @@ class Player6:
             temp_board = copy.deepcopy(board)
             temp_block = copy.deepcopy(block)
             # Apply the current move to the instance
-            self.apply_move(temp_board, temp_block, move, flag)
-
+            if depth%2 == 0:
+                self.apply_move(temp_board, temp_block, move, flag)
+            else:
+                self.apply_move(temp_board, temp_block, move, self.flag_alternate[flag])                
             # If end node, apply heuristic, else, apply recursion
-            if(depth == 0):
-                print move
-                print temp_block
             if self.check_terminal_state(temp_board, temp_block) is True or depth+1 >= self.MAX_DEPTH:
                 move_dict[move] = self.heuristic(temp_board, temp_block, move, flag)
             else:
@@ -267,10 +266,7 @@ class Player6:
         # print depth, "###", old_move, move_dict
         k=list(move_dict.keys())
         v=list(move_dict.values())
-        if(depth == 0):
-            print self.heuristic(board,block,move,flag)
-            print(move_dict)
-            print("\n")
+
         # Minimax
         if depth%2 == 0:
             return k[v.index(max(v))], max(v)
@@ -282,7 +278,6 @@ class Player6:
         # V = value
         if(old_move==(-1,-1)):
             return (4,4)
-        print block
         self.myflag = flag
         m, v = self.dfs_best_move(board, block, old_move, flag, 0, None, None)
 	return m
