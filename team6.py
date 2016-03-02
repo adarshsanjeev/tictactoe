@@ -60,6 +60,7 @@ class Player6:
 
     def check_block_win(self, board, block, move, flag):
         base = ((move[0]/3)*3, (move[1]/3)*3)
+
         block_id = base[0] + base[1]/3
         # print move, flag
         # print base, block_id
@@ -69,22 +70,25 @@ class Player6:
         for i in range(base[0], base[0]+3):
             if board[i][base[1]] == board[i][base[1]+1] == board[i][base[1]+2] == flag:
                 block[block_id] = flag
+                return
         #COLS
         for i in range(base[1], base[1]+3):
             if board[base[0]][i] == board[base[0]+1][i] == board[base[0]+2][i] == flag:
                 block[block_id] = flag
+                return
         #DIAG
         if board[base[0]][base[1]] == board[base[0]+1][base[1]+1] == board[base[0]+2][base[1]+2] == flag:
             block[block_id] = flag
+            return
         if board[base[0]+2][base[1]] == board[base[0]+1][base[1]+1] == board[base[0]][base[1]+2] == flag:
             block[block_id] = flag
+            return
             
         for i in range(base[0], base[0]+3):
             for j in range(base[1], base[1]+3):
                 if board[i][j] == '-':
-                    pass
-            else:
-                block[block_id] = 'D'
+                    return
+        block[block_id] = 'D'
     
     def heuristic(self, board, block, new_move, flag):
         # THIS FUNCTION, SHIVIN
@@ -213,7 +217,7 @@ class Player6:
             for choice in blocks_allowed:
                 base = ((choice/3)*3+1, (choice%3)*3+1)
                 if board[base[0]][base[1]] == '-':
-                    return base, 0
+                    pass#                    return base, 0
         cells = self.get_empty_out_of(board, blocks_allowed, block)
         # Process each in DFS
         move_dict = {}
@@ -223,6 +227,7 @@ class Player6:
             temp_block = copy.deepcopy(block)
             # Apply the current move to the instance
             self.apply_move(temp_board, temp_block, move, flag)
+
             # If end node, apply heuristic, else, apply recursion
             if(depth == 0):
                 print move
@@ -259,6 +264,7 @@ class Player6:
     def move(self, board, block, old_move, flag):
         # TODO HARDCODE INITAL GAME MOVEMENTS HERE
         # V = value
+        print block
         self.myflag = flag
         m, v = self.dfs_best_move(board, block, old_move, flag, 0, None, None)
 	return m
