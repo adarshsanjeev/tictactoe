@@ -92,17 +92,16 @@ class Player6:
     
     def heuristic(self, board, block, new_move, flag):
         # THIS FUNCTION, SHIVIN
-        return self.evaluate_board(board,block,flag,self.flag_alternate[flag])
         #return random.randrange(-100, 100)
-    
         self.mapping[flag]=1
         self.mapping[self.flag_alternate[flag]]=-1
+        return self.evaluate_board(board,block,flag,self.flag_alternate[flag])
 
 
     def evaluate_block(self,block_id,board,flag1,flag2):
         
         self.mapping[flag1]=1
-        self.mapping[self.mapping[flag2]]=-1
+        self.mapping[flag2]=-1
         
         power = 0
         base = ((block_id//3)*3, (block_id%3)*3)
@@ -113,14 +112,10 @@ class Player6:
             val = 0
             for j in range(3):
                 val = val + self.mapping[board[base[0]+i][base[1]+j]]
-            if val > 0 :
-                if(val==2):
-                    val = val+1
-                power = power + pow(10,val)
-            elif val < 0 :
-                if(val==-2):
-                    val = val-1
-                power = power - pow(10,-1*val)
+            if(val==2):
+                power = power + val
+            elif(val==-2):
+                power = power + val
 
     
         #COLS
@@ -128,70 +123,81 @@ class Player6:
             val = 0
             for i in range(3):
                 val = val + self.mapping[board[base[0]+i][base[1]+j]]
-            if val > 0 :
-                if(val==2):
-                    val = val+1
-                power = power + pow(10,val)
-            elif val < 0 :
-                if(val==-2):
-                    val = val-1
-                power = power - pow(10,-1*val)
+            if(val==2):
+                power = power + val
+            if(val==-2):
+                power = power + val
         
         val=0
         for i in range(3):
             val = val + self.mapping[board[base[0]+i][base[1]+i]]
-        if val > 0 :
-            if(val==2):
-                val = val+1
-            power = power + pow(10,val)
-        elif val < 0 :
-            if(val==-2):
-                val = val-1
-            power = power - pow(10,-1*val)
+        if(val==2):
+            power = power + val
+        if(val==-2):
+            power = power + val
     
         val = 0
         for i in range(3):
             val = val + self.mapping[board[base[0]+i][base[1]+2-i]]
-        if val > 0 :
-            if(val==2):
-                val = val+1
-            power = power + pow(10,val)
-        elif val < 0 :
-            if(val==-2):
-                val = val-1
-            power = power - pow(10,-1*val)
-       
-        if(board[base[0]+1][base[1]+1]==flag1):
-            power = power + pow(10,2)
-        elif(board[base[0]+1][base[1]+1]==flag2):
-            power = power - pow(10,2)
+        if(val==2):
+            power = power + val
+        if(val==-2):
+            power = power + val
         
+       
+        """ if(board[base[0]+1][base[1]+1]==flag1 ):
+            power = power + self.mapping[board[base[0]+1][base[1]+1]]
+        """
+        for i in [0,2]:
+            for j in [0,2]:
+                power = power + 2*self.mapping[board[base[0]+1][base[1]+1]]
+
+        
+        val=0
+        for i in range(base[0],base[0]+3):
+            for j in range(base[1],base[1]+3):
+                val = val+self.mapping[board[i][j]]
+        
+        """ if block_id == 4:
+            val = val*3
+        """ 
+        power = power + val
         return power
     
 
     def evaluate_board(self,board,blocks,flag1,flag2):
         sum = 0
+        if(len(blocks)>2):
+            sum = sum + 5
         for line in self.WIN:
             val = 0
             for cell in line:
                 if(blocks[cell]==flag1):
-                    val+=1
+                    val = val + 10
                 elif(blocks[cell]==flag2):
-                    val-=1
-            if(val>0):
-                if(val==2):
-                    val = val+1
-                sum = sum + 100*pow(10,val)
-            elif(val<0):
-                if(val==2):
-                    val = val -1
-                sum = sum - 100*pow(10,-1*val)
-            if(blocks[4]==flag1):
-                sum = sum + 1000
-            elif(blocks[4]==flag2):
-                sum = sum -1000
+                    val = val - 10
+            if(val==20):
+                val = val + 6
+            if(val==-20):
+                val = val - 6
+            if(val==30):
+                sum = sum + 10000
+            elif(val==-30):
+                sum = sum - 10000
+            sum = sum + val
+        """if(blocks[4]==flag1):
+            sum = sum + 5
+        elif(blocks[4]==flag2):
+            sum = sum - 5
+        """
+        for i in [0,2,6,8]:
+            if(blocks[i] == flag1):
+                sum = sum + 4
+            elif(blocks[i]==flag2):
+                sum = sum -4
+            
         for i in range(9):
-            sum = sum + self.evaluate_block(i,board,flag1,flag2)
+                sum = sum + self.evaluate_block(i,board,flag1,flag2)
         return sum 
 
     def apply_move(self, board, block, move, flag):
@@ -211,14 +217,24 @@ class Player6:
     def dfs_best_move(self, board, block, old_move, flag, depth, alpha, beta):
         # Get available blocks
 	blocks_allowed  = self.get_allowed_blocks(old_move, block)
-
+        
         # BASE HARDCODE
-        if sum(1 for row in board for i in row if i == '-') > 73:
+        """if sum(1 for row in board for i in row if i == '-') > 73:
             for choice in blocks_allowed:
                 base = ((choice/3)*3+1, (choice%3)*3+1)
                 if board[base[0]][base[1]] == '-':
                     pass#                    return base, 0
+        """
         cells = self.get_empty_out_of(board, blocks_allowed, block)
+        if(depth == 0):
+            if(len(cells)>12):
+                MAX_DEPTH = 3
+            if(len(cells)>10):
+                MAX_DEPTH = 4
+            elif(len(cells)>7):
+                MAX_DEPTH = 5
+            else:
+                MAX_DEPTH = 9
         # Process each in DFS
         move_dict = {}
         for move in cells:
@@ -231,7 +247,7 @@ class Player6:
             # If end node, apply heuristic, else, apply recursion
             if(depth == 0):
                 print move
-                print block
+                print temp_block
             if self.check_terminal_state(temp_board, temp_block) is True or depth+1 >= self.MAX_DEPTH:
                 move_dict[move] = self.heuristic(temp_board, temp_block, move, flag)
             else:
@@ -264,6 +280,8 @@ class Player6:
     def move(self, board, block, old_move, flag):
         # TODO HARDCODE INITAL GAME MOVEMENTS HERE
         # V = value
+        if(old_move==(-1,-1)):
+            return (4,4)
         print block
         self.myflag = flag
         m, v = self.dfs_best_move(board, block, old_move, flag, 0, None, None)
