@@ -55,7 +55,7 @@ def run_prog():
         score_lock.release_lock()
 
 score_lock = threading.Lock()
-CORES = 1#cpu_count()
+CORES = 2#cpu_count()
 threads = [threading.Thread(target=run_prog) for i in range(CORES)]
 
 for i in range(CORES):

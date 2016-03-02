@@ -110,9 +110,14 @@ class Player6:
             for j in range(3):
                 val = val + self.mapping[board[base[0]+i][base[1]+j]]
             if val > 0 :
+                if(val==2):
+                    val = val+1
                 power = power + pow(10,val)
             elif val < 0 :
+                if(val==-2):
+                    val = val-1
                 power = power - pow(10,-1*val)
+
     
         #COLS
         for j in range(3):
@@ -120,25 +125,42 @@ class Player6:
             for i in range(3):
                 val = val + self.mapping[board[base[0]+i][base[1]+j]]
             if val > 0 :
+                if(val==2):
+                    val = val+1
                 power = power + pow(10,val)
             elif val < 0 :
+                if(val==-2):
+                    val = val-1
                 power = power - pow(10,-1*val)
         
         val=0
         for i in range(3):
             val = val + self.mapping[board[base[0]+i][base[1]+i]]
         if val > 0 :
+            if(val==2):
+                val = val+1
             power = power + pow(10,val)
         elif val < 0 :
+            if(val==-2):
+                val = val-1
             power = power - pow(10,-1*val)
     
         val = 0
         for i in range(3):
             val = val + self.mapping[board[base[0]+i][base[1]+2-i]]
         if val > 0 :
+            if(val==2):
+                val = val+1
             power = power + pow(10,val)
         elif val < 0 :
+            if(val==-2):
+                val = val-1
             power = power - pow(10,-1*val)
+       
+        if(board[base[0]+1][base[1]+1]==flag1):
+            power = power + pow(10,2)
+        elif(board[base[0]+1][base[1]+1]==flag2):
+            power = power - pow(10,2)
         
         return power
     
@@ -153,10 +175,17 @@ class Player6:
                 elif(blocks[cell]==flag2):
                     val-=1
             if(val>0):
-                sum = sum + 10*pow(10,val)
+                if(val==2):
+                    val = val+1
+                sum = sum + 100*pow(10,val)
             elif(val<0):
-                sum = sum - 10*pow(10,-1*val)
-        
+                if(val==2):
+                    val = val -1
+                sum = sum - 100*pow(10,-1*val)
+            if(blocks[4]==flag1):
+                sum = sum + 1000
+            elif(blocks[4]==flag2):
+                sum = sum -1000
         for i in range(9):
             sum = sum + self.evaluate_block(i,board,flag1,flag2)
         return sum 
@@ -195,6 +224,9 @@ class Player6:
             # Apply the current move to the instance
             self.apply_move(temp_board, temp_block, move, flag)
             # If end node, apply heuristic, else, apply recursion
+            if(depth == 0):
+                print move
+                print block
             if self.check_terminal_state(temp_board, temp_block) is True or depth+1 >= self.MAX_DEPTH:
                 move_dict[move] = self.heuristic(temp_board, temp_block, move, flag)
             else:
@@ -214,6 +246,10 @@ class Player6:
         # print depth, "###", old_move, move_dict
         k=list(move_dict.keys())
         v=list(move_dict.values())
+        if(depth == 0):
+            print self.heuristic(board,block,move,flag)
+            print(move_dict)
+            print("\n")
         # Minimax
         if depth%2 == 0:
             return k[v.index(max(v))], max(v)
