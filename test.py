@@ -17,7 +17,7 @@ import sys
 import random
 import signal
 from team6 import Player6
-from team56 import Player56
+from team56 import Player56 as Player
 from time import time
 import os
 
@@ -418,7 +418,7 @@ if __name__ == '__main__':
 	option = sys.argv[1]	
 	if option == '1':
 		obj1 = Player6()
-		obj2 = Player56()
+		obj2 = Player()
 
 	elif option == '2':
 		obj1 = Player6()
