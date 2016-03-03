@@ -22,6 +22,27 @@ class Player6:
         7: [6, 8],
         8: [5, 7],
     }
+    def make_block_str(self,board,block_number):
+        x,y = self.get_block_coords(block_number)
+        string = ""
+        for i in xrange(x,x+3):
+            for j in xrange(y,y+3):
+                string += board[i][j]
+        return string
+    
+    def get_block_coords(self,block_number):
+        return {
+            0 : (0, 0),
+            1 : (0, 3),
+            2 : (0, 6),
+            3 : (3, 0),
+            4 : (3, 3),
+            5 : (3, 6),
+            6 : (6, 0),
+            7 : (6, 3),
+            8 : (6, 6),
+        }.get(block_number)
+
 
     def get_allowed_blocks(self, old_move, block):
         if old_move == (-1, -1):
