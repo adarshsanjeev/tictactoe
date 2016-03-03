@@ -47,7 +47,7 @@ while board[2][2] != 3:
     block = ['-'] * 9
     pl6.check_block_win(game_board, block, (0, 0), 'x')
     value = pl6.evaluate_block(0, game_board, 'x', 'o')
-    print "'", pl6.make_block_str(game_board, 0), "'", ":", value, ",",
+    print "'"+pl6.make_block_str(game_board, 0)+"'", ":", value, ",",
 
     board[0][0] += 1
 
