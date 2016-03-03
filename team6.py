@@ -3,8 +3,6 @@
 import random
 import copy
 
-
-
 class Player6:
     def __init__(self):
         pass
@@ -22,7 +20,8 @@ class Player6:
         7: [6, 8],
         8: [5, 7],
     }
-    def make_block_str(self,board,block_number):
+
+    def make_block_str(self, board, block_number):
         x,y = self.get_block_coords(block_number)
         string = ""
         for i in xrange(x,x+3):
@@ -118,7 +117,6 @@ class Player6:
         self.mapping[self.flag_alternate[flag]]=-1
         return self.evaluate_board(board,block,flag,self.flag_alternate[flag])
 
-
     def evaluate_block(self,block_id,board,flag1,flag2):
         
         self.mapping[flag1]=1
@@ -133,9 +131,9 @@ class Player6:
             val = 0
             for j in range(3):
                 val = val + self.mapping[board[base[0]+i][base[1]+j]]
-            if(val==2):
+            if(val>=2):
                 power = power + val
-            elif(val==-2):
+            elif(val<=-2):
                 power = power + val
 
     
@@ -144,29 +142,29 @@ class Player6:
             val = 0
             for i in range(3):
                 val = val + self.mapping[board[base[0]+i][base[1]+j]]
-            if(val==2):
+            if(val>=2):
                 power = power + val
-            if(val==-2):
+            if(val<=-2):
                 power = power + val
         
         val=0
         for i in range(3):
             val = val + self.mapping[board[base[0]+i][base[1]+i]]
-        if(val==2):
+        if(val>=2):
             power = power + val
-        if(val==-2):
+        if(val<=-2):
             power = power + val
     
         val = 0
         for i in range(3):
             val = val + self.mapping[board[base[0]+i][base[1]+2-i]]
-        if(val==2):
+        if(val>=2):
             power = power + val
-        if(val==-2):
+        if(val<=-2):
             power = power + val
         
        
-        if(board[base[0]+1][base[1]+1]==flag1 ):
+        if 1 or (board[base[0]+1][base[1]+1]==flag1):
             power = power + 2*self.mapping[board[base[0]+1][base[1]+1]]
 
         for i in [0,2]:
